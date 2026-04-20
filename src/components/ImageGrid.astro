@@ -1,0 +1,25 @@
+---
+import { getGalleryImages } from '../lib/content';
+
+interface Props {
+  folder: string;
+  alt: string;
+}
+
+const { folder, alt } = Astro.props;
+const images = getGalleryImages(folder);
+---
+{images.length > 0 && (
+  <div class="image-grid fade-in">
+    {images.map(img => (
+      <div class="image-grid-item" data-title={img.title || ''} data-description={img.description || ''}>
+        <img src={img.src} alt={img.title || alt} loading="lazy" />
+        {img.title && (
+          <div class="image-caption">
+            <span class="image-caption-title">{img.title}</span>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+)}

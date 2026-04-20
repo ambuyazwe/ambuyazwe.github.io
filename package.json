@@ -1,0 +1,23 @@
+{
+  "name": "astro-site",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [],
+  "author": "charlozard",
+  "license": "ISC",
+  "description": "",
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.19",
+    "marked": "^17.0.5",
+    "pdfjs-dist": "^5.6.205"
+  }
+}

@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import SkillRing from '../components/SkillRing.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import { readSite, readAbout, readSkills } from '../lib/content';
+
+const site = readSite();
+const about = readAbout();
+const skills = readSkills();
+---
+<Base title={`${site.name} — ${site.tagline}`} ogImage={site.og_image}>
+  <section class="hero">
+    {site.portrait && <img src={site.portrait} alt={`${site.name} — ${site.tagline}`} class="hero-portrait" loading="eager">}
+    <div class="hero-text">
+      <h1 class="hero-name">{site.name}</h1>
+      <p class="hero-tagline">{site.tagline}</p>
+    </div>
+    <a href="#about" class="hero-scroll-down" aria-label="Scroll to about section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </a>
+  </section>
+
+  <main>
+    <section class="section" id="about">
+      <div class="container fade-in">
+        <h2 class="section-title">{about.title}</h2>
+        <div class="about-content" set:html={about.html} />
+      </div>
+    </section>
+
+    <section class="section section--alt" id="proficiency">
+      <div class="container fade-in">
+        <h2 class="section-title">Proficiency Levels</h2>
+        <div class="proficiency-grid">
+          {skills.map(s => <SkillRing name={s.name} percent={s.percent} />)}
+        </div>
+        <div style="text-align:center; margin-top:40px;">
+          <a href="/gallery" class="btn btn--dark">View Gallery</a>
+        </div>
+      </div>
+    </section>
+
+    <CtaBanner heading={site.ctaHeading} subheading={site.ctaSubheading} buttonText="Contact Me" buttonLink="/contact" />
+    <ContactStrip phone={site.phone} email={site.email} linkedin={site.linkedin} />
+  </main>
+</Base>

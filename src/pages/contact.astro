@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import { readSite, readReferences } from '../lib/content';
+
+const site = readSite();
+const references = readReferences();
+---
+<Base title="Contact — Andile Mbuyazwe" description="Get in touch with Andile Mbuyazwe for graphic design work, collaborations, and inquiries." ogImage={site.og_image}>
+  <section class="contact-hero">
+    <h1>Get Back To Me</h1>
+    <div class="contact-details fade-in">
+      <div class="contact-row">
+        <span class="contact-row-label">Cellphone No.</span>
+        <span class="contact-row-separator">|</span>
+        <span>{site.phone}</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-row-label">Email Address</span>
+        <span class="contact-row-separator">|</span>
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+      </div>
+      <div class="contact-row">
+        <span class="contact-row-label">LinkedIn</span>
+        <span class="contact-row-separator">|</span>
+        <a href={site.linkedin} target="_blank" rel="noopener">{site.linkedin?.replace('http://', '')}</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="section" id="references">
+      <div class="container">
+        <h2 class="section-title fade-in">References</h2>
+        <div class="references-grid fade-in">
+          {references.map(ref => (
+            <div class="reference-card">
+              <h3>{ref.name}</h3>
+              <p class="role">{ref.role}</p>
+              <div class="ref-contact">
+                {ref.phone && <span>{ref.phone}</span>}
+                {ref.email && <a href={`mailto:${ref.email}`}>{ref.email}</a>}
+                {ref.linkedin && <a href={ref.linkedin} target="_blank" rel="noopener">LinkedIn Profile</a>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <CtaBanner heading={site.ctaHeading} subheading={site.ctaSubheading} buttonText="Home Page" buttonLink="/" />
+  </main>
+</Base>

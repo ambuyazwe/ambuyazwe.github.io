@@ -1,0 +1,14 @@
+---
+interface Props {
+  heading: string;
+  subheading: string;
+  buttonText: string;
+  buttonLink: string;
+}
+const { heading, subheading, buttonText, buttonLink } = Astro.props;
+---
+<section class="cta-banner">
+  <h2>{heading}</h2>
+  <p>{subheading}</p>
+  <a href={buttonLink} class="btn">{buttonText}</a>
+</section>

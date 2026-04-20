@@ -1,0 +1,195 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description = "Portfolio of Andile Mbuyazwe, graphic designer.", ogImage = "/og-image.png" } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://ambuyazwe.sevalla.page');
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <link rel="canonical" href={canonicalUrl}>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content={new URL(ogImage, canonicalUrl).href}>
+  <meta property="og:url" content={canonicalUrl}>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={new URL(ogImage, canonicalUrl).href}>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-light.png" media="(prefers-color-scheme: light)">
+  <link rel="icon" type="image/png" href="/favicon-dark.png" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <Header />
+  <div class="page-content">
+    <slot />
+  </div>
+  <Footer />
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Nav
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    const backdrop = document.querySelector('.nav-backdrop');
+    const header = document.querySelector('.site-header');
+
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('open');
+        backdrop?.classList.toggle('active');
+        document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+      });
+      backdrop?.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+      navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('open');
+        backdrop?.classList.remove('active');
+        document.body.style.overflow = '';
+      }));
+    }
+    const heroScroll = document.querySelector('.hero-scroll-down');
+    if (header || heroScroll) {
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        header?.classList.toggle('scrolled', y > 10);
+        heroScroll?.classList.toggle('hidden', y > 10);
+      });
+    }
+
+    // Fade-in animations
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const fadeObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); } });
+    }, { threshold: 0.05, rootMargin: '0px 0px 200px 0px' });
+    fadeEls.forEach(el => fadeObs.observe(el));
+    // Safety net: force all visible after 3s in case observer misses any
+    setTimeout(() => fadeEls.forEach(el => el.classList.add('visible')), 3000);
+
+    // Proficiency rings (SVG stroke-dashoffset animation)
+    document.querySelectorAll('.progress-ring').forEach(ring => {
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const svg = entry.target as SVGElement;
+            const fill = svg.querySelector('.progress-ring__fill') as SVGCircleElement;
+            if (!fill) return;
+            const circumference = parseFloat(svg.dataset.circumference || '0');
+            const targetOffset = parseFloat(svg.dataset.offset || '0');
+            fill.style.transition = 'stroke-dashoffset 1.2s ease';
+            fill.setAttribute('stroke-dashoffset', String(targetOffset));
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      obs.observe(ring);
+    });
+
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) {
+      const lbImg = lightbox.querySelector('img') as HTMLImageElement;
+      const lbTitle = lightbox.querySelector('.lightbox-title') as HTMLElement;
+      const lbDesc = lightbox.querySelector('.lightbox-desc') as HTMLElement;
+      const lbInfo = lightbox.querySelector('.lightbox-info') as HTMLElement;
+      let lbItems: {src: string; title: string; description: string}[] = [];
+      let lbIndex = 0;
+
+      function showLb() {
+        const item = lbItems[lbIndex];
+        lbImg.src = item.src;
+        lbTitle.textContent = item.title;
+        lbDesc.textContent = item.description;
+        lbInfo.style.display = (item.title || item.description) ? '' : 'none';
+      }
+      function openLb(items: typeof lbItems, i: number) { lbItems = items; lbIndex = i; showLb(); lightbox!.classList.add('active'); document.body.style.overflow = 'hidden'; }
+      function closeLb() { lightbox!.classList.remove('active'); document.body.style.overflow = ''; }
+      function navLb(d: number) { lbIndex = (lbIndex + d + lbItems.length) % lbItems.length; showLb(); }
+
+      document.querySelectorAll('.image-grid').forEach(grid => {
+        const gridItems = grid.querySelectorAll('.image-grid-item');
+        const items = Array.from(gridItems).map(el => ({
+          src: (el.querySelector('img') as HTMLImageElement).src,
+          title: (el as HTMLElement).dataset.title || '',
+          description: (el as HTMLElement).dataset.description || '',
+        }));
+        gridItems.forEach((el, i) => {
+          el.addEventListener('click', () => openLb(items, i));
+        });
+      });
+
+      lightbox.querySelector('.lightbox-close')?.addEventListener('click', closeLb);
+      lightbox.querySelector('.lightbox-prev')?.addEventListener('click', () => navLb(-1));
+      lightbox.querySelector('.lightbox-next')?.addEventListener('click', () => navLb(1));
+      document.addEventListener('keydown', e => {
+        if (!lightbox!.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLb();
+        if (e.key === 'ArrowLeft') navLb(-1);
+        if (e.key === 'ArrowRight') navLb(1);
+      });
+      lightbox.addEventListener('click', e => { if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-content')) closeLb(); });
+    }
+
+    // Gallery scroll spy
+    const galNavLinks = document.querySelectorAll('.gallery-nav-list a');
+    if (galNavLinks.length) {
+      const galSections: {link: Element; target: HTMLElement}[] = [];
+      galNavLinks.forEach(link => {
+        const id = link.getAttribute('href')?.replace('#', '');
+        const target = id ? document.getElementById(id) : null;
+        if (target) galSections.push({ link, target });
+      });
+      if (galSections.length) {
+        let ticking = false;
+        let lastActiveLink: Element | null = null;
+        function updateGalNav() {
+          const scrollY = window.scrollY || window.pageYOffset;
+          let current = galSections[0];
+          for (const s of galSections) { if (s.target.offsetTop - 180 <= scrollY) current = s; }
+          if (current.link !== lastActiveLink) {
+            galNavLinks.forEach(l => l.classList.remove('active'));
+            current.link.classList.add('active');
+            // Scroll the nav horizontally without affecting page scroll
+            const nav = document.querySelector('.gallery-nav') as HTMLElement;
+            if (nav) {
+              const linkEl = current.link as HTMLElement;
+              const navRect = nav.getBoundingClientRect();
+              const linkRect = linkEl.getBoundingClientRect();
+              const scrollLeft = linkRect.left - navRect.left - (navRect.width / 2) + (linkRect.width / 2) + nav.scrollLeft;
+              nav.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            }
+            lastActiveLink = current.link;
+          }
+        }
+        window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(() => { updateGalNav(); ticking = false; }); ticking = true; } });
+        updateGalNav();
+      }
+    }
+    }); // end DOMContentLoaded
+  </script>
+</body>
+</html>

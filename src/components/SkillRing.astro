@@ -1,0 +1,38 @@
+---
+interface Props {
+  name: string;
+  percent: number;
+}
+const { name, percent } = Astro.props;
+const r = 34;
+const circumference = 2 * Math.PI * r;
+const offset = circumference - (percent / 100) * circumference;
+---
+<div class="proficiency-item">
+  <svg class="progress-ring" viewBox="0 0 80 80" data-percent={percent} data-circumference={circumference} data-offset={offset}>
+    <defs>
+      <linearGradient id={`grad-${percent}-${name.replace(/\W/g,'')}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#293133" />
+        <stop offset="100%" stop-color="#7a8a8e" />
+      </linearGradient>
+    </defs>
+    <circle
+      cx="40" cy="40" r={r}
+      fill="none"
+      stroke="#e0e0e0"
+      stroke-width="10"
+    />
+    <circle
+      class="progress-ring__fill"
+      cx="40" cy="40" r={r}
+      fill="none"
+      stroke={`url(#grad-${percent}-${name.replace(/\W/g,'')})`}
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-dasharray={circumference}
+      stroke-dashoffset={circumference}
+      transform="rotate(-90 40 40)"
+    />
+  </svg>
+  <span class="proficiency-label">{name}</span>
+</div>

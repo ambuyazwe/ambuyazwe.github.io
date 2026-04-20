@@ -1,0 +1,28 @@
+---
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'Contact', href: '/contact' },
+];
+---
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a href="/" class="nav-logo">
+      <img src="/images/logo.png" alt="Andile Mbuyazwe" loading="eager">
+    </a>
+    <button class="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      {navItems.map(item => (
+        <li>
+          <a href={item.href} class={currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href)) ? 'active' : ''}>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="nav-backdrop"></div>
+</header>

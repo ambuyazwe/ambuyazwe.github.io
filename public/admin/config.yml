@@ -1,0 +1,209 @@
+backend:
+  name: github
+  repo: ambuyazwe/graphicdesign
+  branch: master
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "site"
+    label: "Site Settings"
+    files:
+      - name: "config"
+        label: "General"
+        file: "content/site.yaml"
+        fields:
+          - { name: "portrait", label: "Portrait Photo", widget: "image", media_folder: "/public/images", public_folder: "/images" }
+          - { name: "og_image", label: "Social Share Image", widget: "image", media_folder: "/public/images", public_folder: "/images", hint: "Preview image when sharing links on social media. Must be 1200x630px (1.91:1 ratio).", required: false }
+          - { name: "name", label: "Name", widget: "string" }
+          - { name: "tagline", label: "Tagline", widget: "string" }
+          - { name: "phone", label: "Phone", widget: "string" }
+          - { name: "email", label: "Email", widget: "string" }
+          - { name: "linkedin", label: "LinkedIn URL", widget: "string" }
+          - { name: "whatsapp", label: "WhatsApp URL", widget: "string" }
+          - { name: "copyright", label: "Copyright Year", widget: "string" }
+          - name: "cta"
+            label: "Call to Action"
+            widget: "object"
+            fields:
+              - { name: "heading", label: "Heading", widget: "string" }
+              - { name: "subheading", label: "Subheading", widget: "string" }
+
+      - name: "about"
+        label: "About Me"
+        file: "content/home/about.md"
+        fields:
+          - { name: "body", label: "About Text", widget: "markdown" }
+
+  - name: "skills"
+    label: "Skills"
+    files:
+      - name: "skills-list"
+        label: "Skills & Proficiency"
+        file: "content/home/skills.yaml"
+        fields:
+          - name: "skills"
+            label: "Skills"
+            widget: "list"
+            fields:
+              - { name: "name", label: "Skill Name", widget: "string" }
+              - { name: "percent", label: "Proficiency %", widget: "number", min: 0, max: 100 }
+
+  - name: "references"
+    label: "References"
+    files:
+      - name: "references-list"
+        label: "References"
+        file: "content/contact/references.yaml"
+        fields:
+          - name: "references"
+            label: "References"
+            widget: "list"
+            fields:
+              - { name: "name", label: "Name", widget: "string" }
+              - { name: "role", label: "Role", widget: "string" }
+              - { name: "phone", label: "Phone", widget: "string", required: false }
+              - { name: "email", label: "Email", widget: "string" }
+              - { name: "linkedin", label: "LinkedIn URL", widget: "string", required: false }
+
+  - name: "gallery-text"
+    label: "Gallery Text"
+    files:
+      - name: "welcome"
+        label: "Welcome"
+        file: "content/gallery/00-welcome/section.md"
+        fields:
+          - { name: "body", label: "Content", widget: "markdown" }
+      - name: "uiux-text"
+        label: "UI/UX & Branding"
+        file: "content/gallery/01-uiux/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "advertisement-text"
+        label: "Advertisement"
+        file: "content/gallery/02-advertisement/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "social-media-text"
+        label: "Social Media"
+        file: "content/gallery/03-social-media/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "photography-text"
+        label: "Photography"
+        file: "content/gallery/04-photography/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "digital-artwork-text"
+        label: "Digital Artwork"
+        file: "content/gallery/05-digital-artwork/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "3d-drawing-text"
+        label: "3D & Drawing"
+        file: "content/gallery/06-3d-drawing/section.md"
+        fields:
+          - { name: "body", label: "Description", widget: "markdown" }
+      - name: "animations-text"
+        label: "Animations & Motion"
+        file: "content/gallery/07-animations/section.md"
+        fields:
+          - { name: "youtube_url", label: "YouTube URL", widget: "string", required: false }
+          - { name: "body", label: "Description", widget: "markdown" }
+
+  - name: "gallery-images"
+    label: "Gallery Images"
+    files:
+      - name: "uiux-images"
+        label: "UI/UX & Branding"
+        file: "content/gallery/01-uiux/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/01-uiux", public_folder: "/gallery/01-uiux" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+      - name: "advertisement-images"
+        label: "Advertisement"
+        file: "content/gallery/02-advertisement/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/02-advertisement", public_folder: "/gallery/02-advertisement" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+      - name: "social-media-images"
+        label: "Social Media"
+        file: "content/gallery/03-social-media/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/03-social-media", public_folder: "/gallery/03-social-media" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+      - name: "photography-images"
+        label: "Photography"
+        file: "content/gallery/04-photography/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/04-photography", public_folder: "/gallery/04-photography" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+      - name: "digital-artwork-images"
+        label: "Digital Artwork"
+        file: "content/gallery/05-digital-artwork/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/05-digital-artwork", public_folder: "/gallery/05-digital-artwork" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+      - name: "3d-drawing-images"
+        label: "3D & Drawing"
+        file: "content/gallery/06-3d-drawing/images.yaml"
+        fields:
+          - name: "images"
+            label: "Images"
+            widget: "list"
+            fields:
+              - { name: "file", label: "Image", widget: "image", media_folder: "/public/gallery/06-3d-drawing", public_folder: "/gallery/06-3d-drawing" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "description", label: "Description", widget: "text", required: false }
+
+  - name: "gallery-pdfs"
+    label: "Gallery PDFs"
+    files:
+      - name: "uiux-pdfs"
+        label: "UI/UX & Branding"
+        file: "content/gallery/01-uiux/pdfs.yaml"
+        fields:
+          - name: "pdfs"
+            label: "PDFs"
+            widget: "list"
+            fields:
+              - { name: "file", label: "PDF", widget: "file", media_folder: "/public/gallery/01-uiux", public_folder: "/gallery/01-uiux" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "subtitle", label: "Subtitle", widget: "string" }
+      - name: "advertisement-pdfs"
+        label: "Advertisement"
+        file: "content/gallery/02-advertisement/pdfs.yaml"
+        fields:
+          - name: "pdfs"
+            label: "PDFs"
+            widget: "list"
+            fields:
+              - { name: "file", label: "PDF", widget: "file", media_folder: "/public/gallery/02-advertisement", public_folder: "/gallery/02-advertisement" }
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "subtitle", label: "Subtitle", widget: "string" }

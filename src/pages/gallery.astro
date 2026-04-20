@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import GallerySection from '../components/GallerySection.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { readSite, readGalleryWelcome, readGallerySections } from '../lib/content';
+
+const site = readSite();
+const welcome = readGalleryWelcome();
+const sections = readGallerySections();
+---
+<Base title="Gallery — Andile Mbuyazwe" description="Explore Andile Mbuyazwe's graphic design portfolio." ogImage={site.og_image}>
+  <nav class="gallery-nav">
+    <ul class="gallery-nav-list">
+      {sections.map((s, i) => (
+        <li><a href={`#${s.id}`} class={i === 0 ? 'active' : ''}>{s.title}</a></li>
+      ))}
+    </ul>
+  </nav>
+
+  <main>
+    <section class="gallery-welcome">
+      <div class="container fade-in" style="text-align:center; max-width:750px;">
+        <h2 class="section-title">{welcome.title}</h2>
+        <div class="section-subtitle" set:html={welcome.html} />
+      </div>
+    </section>
+
+    {sections.map(s => (
+      <GallerySection
+        id={s.id}
+        title={s.title}
+        folder={s.folder}
+        description={s.html}
+        pdfs={s.pdfs.length > 0 ? s.pdfs : undefined}
+        youtubeUrl={s.youtubeUrl}
+      />
+    ))}
+
+    <CtaBanner heading="Bringing Ideas to Life" subheading="Let's Work Together" buttonText="Contact Me" buttonLink="/contact" />
+    <ContactStrip phone={site.phone} email={site.email} linkedin={site.linkedin} />
+  </main>
+
+  <Lightbox />
+</Base>
