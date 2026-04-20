@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: ambuyazwe/graphicdesign
+  repo: ambuyazwe/ambuyazwe.github.io
   branch: master
 
 media_folder: "public/uploads"

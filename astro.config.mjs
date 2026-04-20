@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://ambuyazwe.sevalla.page',
+  site: 'https://ambuyazwe.github.io',
   output: 'static',
   integrations: [sitemap()],
   server: { host: true },
