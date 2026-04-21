@@ -1,33 +1,25 @@
 images:
   - file: /gallery/01-uiux/0100.png
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: Socks Mock-Up
+    description: A mock-up showcasing one of the 'meme socks' designs.
   - file: /gallery/01-uiux/0200.png
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: Pearson Student MYLMS Home Screen
+    description: This images showcases the 'home' screen for the student portal website.
   - file: /gallery/01-uiux/0300.png
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: MYLMS Lecturer Planner
+    description: This images showcases the 'calender/ event' screen for the lecturer portal website.
   - file: /gallery/01-uiux/0400.png
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: MYLMS Lecturer Files
+    description: This images showcases the 'files' screen for the lecturer where they can upload content and assignments for students.
   - file: /gallery/01-uiux/0500.jpg
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: ABSA Online Choose Store
+    description: This is the Main Home Screen where you can select a store.
   - file: /gallery/01-uiux/0600.jpg
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: ABSA Online Shopping Checkout
+    description: An example of the Checkout Screen.
   - file: /gallery/01-uiux/0700.png
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: Model Mock-Up
+    description: A mock-up showing a model wearing one of the pairs of 'meme socks'.
   - file: /gallery/01-uiux/0800.jpg
-    title: Picture
-    description: Portfolio piece by Andile Mbuyazwe
-
+    title: ABSA Online Store Menu
+    description: This is an example of the store interface once you select a store.
