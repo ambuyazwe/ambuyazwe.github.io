@@ -21,7 +21,7 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>{docTitle}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,11 +72,51 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       flex: 1;
       margin: 0 16px;
     }
-    .pdf-page-count {
-      font-size: 0.75rem;
-      letter-spacing: 1px;
-      color: rgba(255, 255, 255, 0.5);
+    .pdf-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
     }
+    .pdf-header-sep {
+      width: 1px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .pdf-page-count {
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.45);
+      white-space: nowrap;
+    }
+    .pdf-zoom {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pdf-zoom-level {
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.6);
+      min-width: 38px;
+      text-align: center;
+    }
+    .pdf-zoom-btn {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .pdf-zoom-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+    .pdf-zoom-btn:disabled { opacity: 0.3; cursor: default; }
+    .pdf-zoom-btn svg { width: 14px; height: 14px; }
     .pdf-layout {
       width: 100%;
     }
@@ -109,13 +149,62 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       right: 16px;
       width: 320px;
       padding: 22px 22px 24px;
-      background: rgba(255, 255, 255, 0.06);
+      background: #1e2021;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 10px;
       max-height: calc(100vh - 88px);
       overflow-y: auto;
       z-index: 5;
+      opacity: 0;
+      transition: opacity 0.35s ease, max-height 0.3s ease;
     }
+    .pdf-info.visible { opacity: 1; }
+    .pdf-info.zoomed-hidden { opacity: 0; pointer-events: none; }
+    .pdf-info.force-mobile {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: auto;
+      max-height: 60vh;
+      max-height: 60dvh;
+      padding: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      border-radius: 0;
+      border: none;
+      background: rgba(82, 86, 89, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pdf-info.force-mobile.collapsed {
+      max-height: calc(44px + env(safe-area-inset-bottom, 0px));
+    }
+    .pdf-info.force-mobile .pdf-info-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: #000;
+      font-family: inherit;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .pdf-info.force-mobile .pdf-info-chevron { width: 16px; height: 16px; color: #000; }
+    .pdf-info.force-mobile.collapsed .pdf-info-chevron { transform: rotate(180deg); }
+    .pdf-info.force-mobile .pdf-info-panel { padding: 4px 16px 20px; overflow-y: auto; flex: 1; }
+    .pdf-info.force-mobile .pdf-info-label { display: none; }
+    .pdf-info.force-mobile .pdf-info-desc { color: #000; }
     .pdf-info-toggle {
       display: none;
     }
@@ -138,8 +227,11 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       .pdf-header-btn { font-size: 0.65rem; padding: 6px; }
       .pdf-header-btn svg { width: 16px; height: 16px; }
       .pdf-title { font-size: 0.7rem; }
+      .pdf-zoom { display: none; }
+      .pdf-header-sep { display: none; }
       .pdf-main { padding-bottom: 56px; }
       .pdf-info {
+        opacity: 1;
         position: fixed;
         top: auto;
         bottom: 0;
@@ -148,19 +240,23 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
         width: auto;
         margin: 0;
         padding: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
         border-radius: 0;
         border: none;
         background: rgba(82, 86, 89, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(20px) brightness(1.5);
+        -webkit-backdrop-filter: blur(20px) brightness(1.5);
         z-index: 20;
         display: flex;
         flex-direction: column;
         max-height: 60vh;
+        max-height: 60dvh;
         overflow: hidden;
         transition: max-height 0.3s ease;
       }
-      .pdf-info.collapsed { max-height: 44px; }
+      .pdf-info.collapsed {
+        max-height: calc(44px + env(safe-area-inset-bottom, 0px));
+      }
       .pdf-info-toggle {
         display: flex;
         align-items: center;
@@ -201,7 +297,19 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       Back
     </button>
     <span class="pdf-title">{title}</span>
-    <span class="pdf-page-count" id="page-count"></span>
+    <div class="pdf-header-right">
+      <span class="pdf-page-count" id="page-count"></span>
+      <span class="pdf-header-sep"></span>
+      <div class="pdf-zoom" id="pdf-zoom">
+        <button class="pdf-zoom-btn" id="zoom-out" aria-label="Zoom out" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <span class="pdf-zoom-level" id="zoom-level">100%</span>
+        <button class="pdf-zoom-btn" id="zoom-in" aria-label="Zoom in">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
   </div>
   <div class="pdf-layout">
     <div class="pdf-main">
@@ -240,34 +348,110 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       });
     }
 
-    import('https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.min.mjs').then(async function(pdfjsLib) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
-      var doc = await pdfjsLib.getDocument(file).promise;
+    var ZOOM_STEPS = [0.75, 1, 1.25, 1.5, 2];
+    var zoomIndex = 1; // start at 100%
+    var pdfDoc = null;
+    var baseMaxWidth = 0;
+    var pagesEl = document.getElementById('pdf-pages');
+    var loadingEl = document.getElementById('pdf-loading');
+    var zoomOutBtn = document.getElementById('zoom-out');
+    var zoomInBtn = document.getElementById('zoom-in');
+    var zoomLevelEl = document.getElementById('zoom-level');
+
+    function updateZoomButtons() {
+      zoomOutBtn.disabled = zoomIndex === 0;
+      zoomInBtn.disabled = zoomIndex === ZOOM_STEPS.length - 1;
+      zoomLevelEl.textContent = Math.round(ZOOM_STEPS[zoomIndex] * 100) + '%';
+    }
+
+    // Sidebar: right edge of centered PDF vs left edge of sidebar (right:16 width:320)
+    function pdfOverlapsSidebar(pdfWidth) {
+      var sidebarLeft = window.innerWidth - 336;
+      var pdfRight = (window.innerWidth + pdfWidth) / 2;
+      return pdfRight > sidebarLeft;
+    }
+
+    function positionSidebar(isZoomChange) {
+      if (!infoEl || window.innerWidth <= 1024) return;
+      var pdfWidth = baseMaxWidth * ZOOM_STEPS[zoomIndex];
+      var overlaps = pdfOverlapsSidebar(pdfWidth);
+      if (!isZoomChange) {
+        var mainEl = document.querySelector('.pdf-main');
+        if (overlaps) {
+          infoEl.classList.add('force-mobile');
+          if (mainEl) mainEl.style.paddingBottom = '56px';
+        } else {
+          infoEl.classList.remove('force-mobile');
+          if (mainEl) mainEl.style.paddingBottom = '';
+        }
+        infoEl.classList.add('visible');
+      } else {
+        if (!infoEl.classList.contains('force-mobile')) {
+          if (overlaps) {
+            infoEl.classList.add('zoomed-hidden');
+          } else {
+            infoEl.classList.remove('zoomed-hidden');
+          }
+        }
+      }
+    }
+
+    async function renderPages(doc, maxW) {
       var dpr = window.devicePixelRatio || 1;
-      var pagesEl = document.getElementById('pdf-pages');
-      var loadingEl = document.getElementById('pdf-loading');
-      var pageCountEl = document.getElementById('page-count');
-
-      loadingEl.style.display = 'none';
-      pagesEl.style.display = '';
-      pageCountEl.textContent = doc.numPages + ' page' + (doc.numPages > 1 ? 's' : '');
-
-      var maxWidth = Math.min(pagesEl.clientWidth - 32, 1200);
-
+      // Extra resolution multiplier so pinch-zoom stays sharp longer
+      var quality = Math.max(dpr, 2);
+      pagesEl.innerHTML = '';
       for (var i = 1; i <= doc.numPages; i++) {
         var page = await doc.getPage(i);
         var unscaled = page.getViewport({ scale: 1 });
-        var scale = maxWidth / unscaled.width;
-        var viewport = page.getViewport({ scale: scale * dpr });
+        var scale = maxW / unscaled.width;
+        var viewport = page.getViewport({ scale: scale * quality });
         var canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        canvas.style.width = Math.round(viewport.width / dpr) + 'px';
-        canvas.style.height = Math.round(viewport.height / dpr) + 'px';
+        canvas.style.width = Math.round(viewport.width / quality) + 'px';
+        canvas.style.height = Math.round(viewport.height / quality) + 'px';
         var ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
         pagesEl.appendChild(canvas);
       }
+    }
+
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', async function() {
+        if (zoomIndex > 0) {
+          var ratio = window.scrollY / document.documentElement.scrollHeight;
+          zoomIndex--;
+          updateZoomButtons();
+          await renderPages(pdfDoc, baseMaxWidth * ZOOM_STEPS[zoomIndex]);
+          positionSidebar(true);
+          window.scrollTo(0, ratio * document.documentElement.scrollHeight);
+        }
+      });
+      zoomInBtn.addEventListener('click', async function() {
+        if (zoomIndex < ZOOM_STEPS.length - 1) {
+          var ratio = window.scrollY / document.documentElement.scrollHeight;
+          zoomIndex++;
+          updateZoomButtons();
+          await renderPages(pdfDoc, baseMaxWidth * ZOOM_STEPS[zoomIndex]);
+          positionSidebar(true);
+          window.scrollTo(0, ratio * document.documentElement.scrollHeight);
+        }
+      });
+    }
+
+    import('https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.min.mjs').then(async function(pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+      pdfDoc = await pdfjsLib.getDocument(file).promise;
+
+      loadingEl.style.display = 'none';
+      pagesEl.style.display = '';
+      document.getElementById('page-count').textContent = pdfDoc.numPages + ' page' + (pdfDoc.numPages > 1 ? 's' : '');
+
+      baseMaxWidth = Math.min(pagesEl.clientWidth - 32, 1200);
+      updateZoomButtons();
+      await renderPages(pdfDoc, baseMaxWidth);
+      positionSidebar(false);
     });
   </script>
 </body>

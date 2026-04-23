@@ -6,6 +6,7 @@ export default defineConfig({
   output: 'static',
   integrations: [sitemap()],
   server: { host: true },
+  devToolbar: { enabled: false },
   vite: {
     server: {
       allowedHosts: true,

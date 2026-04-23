@@ -1082,8 +1082,10 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .pdf-card {
+    flex: none;
     max-width: none;
     min-width: 0;
+    width: 100%;
   }
 
   .contact-row {
