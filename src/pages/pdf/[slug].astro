@@ -3,26 +3,26 @@ import { readGallerySections } from '../../lib/content';
 
 export function getStaticPaths() {
   const sections = readGallerySections();
-  const paths: { params: { slug: string }; props: { title: string; file: string } }[] = [];
+  const paths: { params: { slug: string }; props: { title: string; subtitle: string; file: string } }[] = [];
 
   for (const section of sections) {
     for (const pdf of section.pdfs) {
-      const title = pdf.subtitle ? `${pdf.title} — ${pdf.subtitle}` : pdf.title;
       const slug = [pdf.title, pdf.subtitle].filter(Boolean).join(' ')
         .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      paths.push({ params: { slug }, props: { title, file: pdf.file } });
+      paths.push({ params: { slug }, props: { title: pdf.title, subtitle: pdf.subtitle, file: pdf.file } });
     }
   }
   return paths;
 }
 
-const { title, file } = Astro.props;
+const { title, subtitle, file } = Astro.props;
+const docTitle = subtitle ? `${title} — ${subtitle}` : title;
 ---
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title}</title>
+  <title>{docTitle}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -77,6 +77,9 @@ const { title, file } = Astro.props;
       letter-spacing: 1px;
       color: rgba(255, 255, 255, 0.5);
     }
+    .pdf-layout {
+      width: 100%;
+    }
     .pdf-pages {
       display: flex;
       flex-direction: column;
@@ -100,8 +103,94 @@ const { title, file } = Astro.props;
       font-size: 0.85rem;
       letter-spacing: 1px;
     }
-    @media (max-width: 768px) {
-      .pdf-title { font-size: 0.75rem; }
+    .pdf-info {
+      position: fixed;
+      top: 72px;
+      right: 16px;
+      width: 320px;
+      padding: 22px 22px 24px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
+      z-index: 5;
+    }
+    .pdf-info-toggle {
+      display: none;
+    }
+    .pdf-info-label {
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 14px;
+    }
+    .pdf-info-desc {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    @media (max-width: 1024px) {
+      .pdf-header { height: 44px; padding: 0 14px; }
+      .pdf-header-btn { font-size: 0.65rem; padding: 6px; }
+      .pdf-header-btn svg { width: 16px; height: 16px; }
+      .pdf-title { font-size: 0.7rem; }
+      .pdf-main { padding-bottom: 56px; }
+      .pdf-info {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        background: rgba(82, 86, 89, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        max-height: 60vh;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .pdf-info.collapsed { max-height: 44px; }
+      .pdf-info-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 12px 16px;
+        background: none;
+        border: none;
+        color: #000;
+        font-family: inherit;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .pdf-info-chevron {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+      }
+      .pdf-info.collapsed .pdf-info-chevron { transform: rotate(180deg); }
+      .pdf-info-panel {
+        padding: 0 16px 20px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .pdf-info-panel .pdf-info-label { display: none; }
+      .pdf-info-desc { color: #000; }
     }
   </style>
 </head>
@@ -114,8 +203,26 @@ const { title, file } = Astro.props;
     <span class="pdf-title">{title}</span>
     <span class="pdf-page-count" id="page-count"></span>
   </div>
-  <div class="pdf-loading" id="pdf-loading">Loading...</div>
-  <div class="pdf-pages" id="pdf-pages" style="display:none;"></div>
+  <div class="pdf-layout">
+    <div class="pdf-main">
+      <div class="pdf-loading" id="pdf-loading">Loading...</div>
+      <div class="pdf-pages" id="pdf-pages" style="display:none;"></div>
+    </div>
+  </div>
+  {subtitle && (
+    <aside class="pdf-info" id="pdf-info">
+      <button class="pdf-info-toggle" id="pdf-info-toggle" type="button" aria-expanded="true" aria-controls="pdf-info-panel">
+        <span>About this project</span>
+        <svg class="pdf-info-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
+      <div class="pdf-info-panel" id="pdf-info-panel">
+        <span class="pdf-info-label">About this project</span>
+        <p class="pdf-info-desc">{subtitle}</p>
+      </div>
+    </aside>
+  )}
 
   <script is:inline define:vars={{ file }}>
     document.getElementById('back-btn').addEventListener('click', function() {
@@ -123,11 +230,20 @@ const { title, file } = Astro.props;
       else window.location.href = '/gallery';
     });
 
+    var infoEl = document.getElementById('pdf-info');
+    var infoToggleEl = document.getElementById('pdf-info-toggle');
+    if (infoToggleEl) {
+      infoToggleEl.setAttribute('aria-expanded', 'true');
+      infoToggleEl.addEventListener('click', function() {
+        var isCollapsed = infoEl.classList.toggle('collapsed');
+        infoToggleEl.setAttribute('aria-expanded', !isCollapsed);
+      });
+    }
+
     import('https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.min.mjs').then(async function(pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
       var doc = await pdfjsLib.getDocument(file).promise;
       var dpr = window.devicePixelRatio || 1;
-      var maxWidth = Math.min(window.innerWidth - 32, 1200);
       var pagesEl = document.getElementById('pdf-pages');
       var loadingEl = document.getElementById('pdf-loading');
       var pageCountEl = document.getElementById('page-count');
@@ -135,6 +251,8 @@ const { title, file } = Astro.props;
       loadingEl.style.display = 'none';
       pagesEl.style.display = '';
       pageCountEl.textContent = doc.numPages + ' page' + (doc.numPages > 1 ? 's' : '');
+
+      var maxWidth = Math.min(pagesEl.clientWidth - 32, 1200);
 
       for (var i = 1; i <= doc.numPages; i++) {
         var page = await doc.getPage(i);

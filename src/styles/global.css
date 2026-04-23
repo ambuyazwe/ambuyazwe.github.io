@@ -652,9 +652,10 @@ h1, h2, h3, h4, h5, h6 {
 .pdf-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
   margin-top: 24px;
   justify-content: center;
+  text-align: left;
 }
 
 .pdf-card {
@@ -666,10 +667,11 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
+  max-width: 440px;
+  flex: 1 1 280px;
   transition: var(--transition);
   cursor: pointer;
-  text-align: left;
 }
 
 .pdf-card:hover {
@@ -688,26 +690,32 @@ h1, h2, h3, h4, h5, h6 {
   color: #c0392b;
 }
 
+.pdf-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .pdf-card-info h4 {
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   color: #293133;
+  transition: color 0.3s ease;
 }
 
 .pdf-card-info p {
-  font-size: 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .pdf-card-icon {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   color: #293133;
   opacity: 0.5;
+  transition: opacity 0.3s ease, color 0.3s ease;
 }
 
 /* --- Lightbox --- */
@@ -1070,10 +1078,12 @@ h1, h2, h3, h4, h5, h6 {
 
   .pdf-grid {
     flex-direction: column;
+    gap: 10px;
   }
 
   .pdf-card {
-    width: 100%;
+    max-width: none;
+    min-width: 0;
   }
 
   .contact-row {
