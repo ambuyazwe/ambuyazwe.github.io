@@ -1,4 +1,7 @@
 images:
+  - file: /gallery/03-social-media/REDMI note 15_Instagram Post.png
+    title: Redmi Note 15 Pro Plus Social Media Post
+    description: This is a social media post for the Redmi Note 15 Pro Plus. This advert aims to showcase the power and capabilities of the device.
   - file: /gallery/03-social-media/0100.avif
     title: Online Car Parts - Post Eight
     description: Sale for a car part. The design choice was meant to bring out the quality of the price.
@@ -20,9 +23,6 @@ images:
   - file: /gallery/03-social-media/0900.avif
     title: Online Car Parts - Post Eleven
     description: A way of exercising my typography skills by using hierarchy to the text.
-  - file: /gallery/03-social-media/1400.avif
-    title: Online Car Parts - Post Two
-    description: This concept resembles loyalty.
   - file: /gallery/03-social-media/1300.avif
     title: Car Parts Bulk Post
     description: A infographic poster showcasing parts for sale for each vehicle displayed within the poster.
