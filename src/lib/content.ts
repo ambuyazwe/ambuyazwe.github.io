@@ -108,6 +108,24 @@ export function readReferences(): Reference[] {
   return refs;
 }
 
+// ── PDF slug ──
+
+function crc32(str: string): number {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i);
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ ((crc & 1) ? 0xEDB88320 : 0);
+    }
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+export function slugForPdf(title: string, file: string): string {
+  const titleSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  return `${titleSlug}-${crc32(file).toString(16)}`;
+}
+
 // ── Gallery ──
 
 export function readGalleryWelcome(): { title: string; html: string } {

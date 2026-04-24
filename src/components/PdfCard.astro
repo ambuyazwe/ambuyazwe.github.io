@@ -1,12 +1,12 @@
 ---
+import { slugForPdf } from '../lib/content';
 interface Props {
   title: string;
   subtitle: string;
   file: string;
 }
-const { title, subtitle } = Astro.props;
-const slug = [title, subtitle].filter(Boolean).join(' ')
-  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const { title, subtitle, file } = Astro.props;
+const slug = slugForPdf(title, file);
 ---
 <a href={`/pdf/${slug}`} class="pdf-card">
   <div class="pdf-card-info">

@@ -1,5 +1,5 @@
 ---
-import { readGallerySections } from '../../lib/content';
+import { readGallerySections, slugForPdf } from '../../lib/content';
 
 export function getStaticPaths() {
   const sections = readGallerySections();
@@ -7,8 +7,7 @@ export function getStaticPaths() {
 
   for (const section of sections) {
     for (const pdf of section.pdfs) {
-      const slug = [pdf.title, pdf.subtitle].filter(Boolean).join(' ')
-        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const slug = slugForPdf(pdf.title, pdf.file);
       paths.push({ params: { slug }, props: { title: pdf.title, subtitle: pdf.subtitle, file: pdf.file } });
     }
   }
@@ -26,6 +25,7 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="modulepreload" href="https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.min.mjs">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -139,9 +139,17 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       align-items: center;
       justify-content: center;
       min-height: 60vh;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-      letter-spacing: 1px;
+    }
+    .pdf-spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      animation: pdf-spin 0.7s linear infinite;
+    }
+    @keyframes pdf-spin {
+      to { transform: rotate(360deg); }
     }
     .pdf-info {
       position: fixed;
@@ -172,9 +180,9 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       padding-bottom: env(safe-area-inset-bottom, 0px);
       border-radius: 0;
       border: none;
-      background: rgba(82, 86, 89, 0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(82, 86, 89, 0.72);
+      backdrop-filter: blur(20px) brightness(2.0);
+      -webkit-backdrop-filter: blur(20px) brightness(2.0);
       z-index: 20;
       display: flex;
       flex-direction: column;
@@ -229,9 +237,7 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       .pdf-title { font-size: 0.7rem; }
       .pdf-zoom { display: none; }
       .pdf-header-sep { display: none; }
-      .pdf-main { padding-bottom: 56px; }
       .pdf-info {
-        opacity: 1;
         position: fixed;
         top: auto;
         bottom: 0;
@@ -243,16 +249,16 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
         padding-bottom: env(safe-area-inset-bottom, 0px);
         border-radius: 0;
         border: none;
-        background: rgba(82, 86, 89, 0.6);
-        backdrop-filter: blur(20px) brightness(1.5);
-        -webkit-backdrop-filter: blur(20px) brightness(1.5);
+        background: rgba(82, 86, 89, 0.72);
+        backdrop-filter: blur(20px) brightness(2.0);
+        -webkit-backdrop-filter: blur(20px) brightness(2.0);
         z-index: 20;
         display: flex;
         flex-direction: column;
         max-height: 60vh;
         max-height: 60dvh;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: opacity 0.35s ease, max-height 0.3s ease;
       }
       .pdf-info.collapsed {
         max-height: calc(44px + env(safe-area-inset-bottom, 0px));
@@ -313,7 +319,7 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
   </div>
   <div class="pdf-layout">
     <div class="pdf-main">
-      <div class="pdf-loading" id="pdf-loading">Loading...</div>
+      <div class="pdf-loading" id="pdf-loading"><div class="pdf-spinner"></div></div>
       <div class="pdf-pages" id="pdf-pages" style="display:none;"></div>
     </div>
   </div>
@@ -340,11 +346,26 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
 
     var infoEl = document.getElementById('pdf-info');
     var infoToggleEl = document.getElementById('pdf-info-toggle');
+    var mainEl = document.querySelector('.pdf-main');
+
+    function updateScrollPadding() {
+      if (!mainEl || !infoEl) return;
+      var isMobile = window.innerWidth <= 1024 || infoEl.classList.contains('force-mobile');
+      if (!isMobile) { mainEl.style.paddingBottom = ''; return; }
+      mainEl.style.paddingBottom = infoEl.offsetHeight + 'px';
+    }
+
+    if (typeof ResizeObserver !== 'undefined' && infoEl) {
+      new ResizeObserver(updateScrollPadding).observe(infoEl);
+    }
+    window.addEventListener('resize', updateScrollPadding);
+
     if (infoToggleEl) {
       infoToggleEl.setAttribute('aria-expanded', 'true');
       infoToggleEl.addEventListener('click', function() {
         var isCollapsed = infoEl.classList.toggle('collapsed');
         infoToggleEl.setAttribute('aria-expanded', !isCollapsed);
+        setTimeout(updateScrollPadding, 320);
       });
     }
 
@@ -376,10 +397,8 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       var pdfWidth = baseMaxWidth * ZOOM_STEPS[zoomIndex];
       var overlaps = pdfOverlapsSidebar(pdfWidth);
       if (!isZoomChange) {
-        var mainEl = document.querySelector('.pdf-main');
         if (overlaps) {
           infoEl.classList.add('force-mobile');
-          if (mainEl) mainEl.style.paddingBottom = '56px';
         } else {
           infoEl.classList.remove('force-mobile');
           if (mainEl) mainEl.style.paddingBottom = '';
@@ -398,23 +417,28 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
 
     async function renderPages(doc, maxW) {
       var dpr = window.devicePixelRatio || 1;
-      // Extra resolution multiplier so pinch-zoom stays sharp longer
       var quality = Math.max(dpr, 2);
       pagesEl.innerHTML = '';
+      var tasks = [];
       for (var i = 1; i <= doc.numPages; i++) {
-        var page = await doc.getPage(i);
-        var unscaled = page.getViewport({ scale: 1 });
-        var scale = maxW / unscaled.width;
-        var viewport = page.getViewport({ scale: scale * quality });
-        var canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.width = Math.round(viewport.width / quality) + 'px';
-        canvas.style.height = Math.round(viewport.height / quality) + 'px';
-        var ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-        pagesEl.appendChild(canvas);
+        tasks.push((function(pageNum) {
+          return doc.getPage(pageNum).then(function(page) {
+            var unscaled = page.getViewport({ scale: 1 });
+            var scale = maxW / unscaled.width;
+            var viewport = page.getViewport({ scale: scale * quality });
+            var canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            canvas.style.width = Math.round(viewport.width / quality) + 'px';
+            canvas.style.height = Math.round(viewport.height / quality) + 'px';
+            return page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise
+              .then(function() { return { pageNum: pageNum, canvas: canvas }; });
+          });
+        })(i));
       }
+      var results = await Promise.all(tasks);
+      results.sort(function(a, b) { return a.pageNum - b.pageNum; });
+      results.forEach(function(r) { pagesEl.appendChild(r.canvas); });
     }
 
     if (zoomOutBtn) {
@@ -452,6 +476,8 @@ const docTitle = subtitle ? `${title} — ${subtitle}` : title;
       updateZoomButtons();
       await renderPages(pdfDoc, baseMaxWidth);
       positionSidebar(false);
+      if (infoEl && window.innerWidth <= 1024) infoEl.classList.add('visible');
+      updateScrollPadding();
     });
   </script>
 </body>

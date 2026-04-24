@@ -1,10 +1,9 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://ambuyazwe.github.io',
   output: 'static',
-  integrations: [sitemap()],
+  integrations: [],
   server: { host: true },
   devToolbar: { enabled: false },
   vite: {
