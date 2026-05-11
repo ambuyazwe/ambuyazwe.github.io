@@ -6,11 +6,11 @@ skills:
   - name: Adobe InDesign
     percent: 85
   - name: Adobe After Effects
-    percent: 75
+    percent: 80
   - name: Figma
     percent: 75
   - name: UI/UX Design
-    percent: 70
+    percent: 80
   - name: Photography / Photo Editing
     percent: 85
   - name: Ideation & Creativity
@@ -18,12 +18,12 @@ skills:
   - name: Visual Art / Drawing
     percent: 85
   - name: Typography
-    percent: 75
+    percent: 80
   - name: Logos & Branding
     percent: 80
   - name: Video Editing
-    percent: 65
-  - name: Digital Marketing
     percent: 70
+  - name: Digital Marketing
+    percent: 85
   - name: Desktop Publishing/ DTP
     percent: 90
