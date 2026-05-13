@@ -1,25 +1,25 @@
 images:
-  - file: /gallery/01-uiux/0100.png
-    title: Socks Mock-Up
-    description: A mock-up showcasing one of the 'meme socks' designs.
+  - file: /gallery/01-uiux/0500.jpg
+    title: ABSA Online Choose Store
+    description: This is the Main Home Screen where you can select the store you want to shop from and view accounts details etc.
+  - file: /gallery/01-uiux/0800.jpg
+    title: ABSA Online Store Menu
+    description: This is an example of the store interface once you select a store. Upon choosing a store you want to shop from through the app, the user is able to add their desired items into their cart.
+  - file: /gallery/01-uiux/0600.jpg
+    title: ABSA Online Shopping Checkout
+    description: An example of the Checkout Screen after the user has added all items they want to purchase from the stores.
   - file: /gallery/01-uiux/0200.png
     title: Pearson Student MYLMS Home Screen
-    description: This images showcases the 'home' screen for the student portal website.
+    description: This images showcases the 'home' screen for the student portal website. In this screen They are able to access all the school information and material that relates to them; like the modules they do and progress on projects, view their calender and latest updates and messages provided by lecturers or the school
   - file: /gallery/01-uiux/0300.png
     title: MYLMS Lecturer Planner
-    description: This images showcases the 'calender/ event' screen for the lecturer portal website.
+    description: This images showcases the 'calender/ event' screen for the lecturer portal website. In this screen Lecturers are able to build planners for themselves or their students and view any upcoming events.
   - file: /gallery/01-uiux/0400.png
     title: MYLMS Lecturer Files
     description: This images showcases the 'files' screen for the lecturer where they can upload content and assignments for students.
-  - file: /gallery/01-uiux/0500.jpg
-    title: ABSA Online Choose Store
-    description: This is the Main Home Screen where you can select a store.
-  - file: /gallery/01-uiux/0600.jpg
-    title: ABSA Online Shopping Checkout
-    description: An example of the Checkout Screen.
+  - file: /gallery/01-uiux/0100.png
+    title: Socks Mock-Up
+    description: A mock-up showcasing one of the 'meme socks' designs. With this project I was tasked by Sock Doctor to come up with a new and fresh range of socks that would be relevant in the era of young people we live in. Since Memes are a big thing in society, my goal was to get a lot of young clients for the company by creating designs that would resonate with them.
   - file: /gallery/01-uiux/0700.png
     title: Model Mock-Up
     description: A mock-up showing a model wearing one of the pairs of 'meme socks'.
-  - file: /gallery/01-uiux/0800.jpg
-    title: ABSA Online Store Menu
-    description: This is an example of the store interface once you select a store.
